@@ -1,7 +1,7 @@
 
 const jsmediatags = window.jsmediatags;
 
-
+let songs;
 function secondsToMinutesAndSeconds(totalSeconds) {
     var minutes = Math.floor(totalSeconds / 60);
     var seconds = Math.floor(totalSeconds % 60);
@@ -116,9 +116,18 @@ function playMusic(songs,image,title,artist){
 })
 
 }
-async function main(){
+async function nextAndPrev(){
+    let Next = document.getElementById("Next");
+    let Previous = document.getElementById("Previous"); 
 
-    // let songs = await getSongs()
+    songs = await getSongs();
+
+    Next.addEventListener("click", ()=>{
+        let index = songs.indexOf(CurrentSongs.src);
+        console.log(index);
+    })
+}
+async function main(){
 
 await NewCard("Assets/Images/default (3).jpeg","Kishore Kumar Mix");
 await NewCard("Assets/Images/default (4).jpeg","Upbeat Mix");
@@ -263,7 +272,7 @@ function getAverageRGB(imgEl) {
 }
 
 async function getSongs(){
-    let data = await fetch('/Spotify/Assets/Music/Old%20Evergreen%20Hindi%20Songs/')
+    let data = await fetch('/Assets/Music/Old%20Evergreen%20Hindi%20Songs/')
     let song = await data.text()
     let div = document.createElement('div')
     div.innerHTML = song;
@@ -272,7 +281,7 @@ async function getSongs(){
     for (let index = 0; index < a.length; index++) {
         const element = a[index];
         if(element.href.endsWith('.mp3'))
-        {
+        { 
             songs.push(element.href)
         }
     }
@@ -368,18 +377,17 @@ async function getSongs(){
 function toggleActiveClass() {
     let songElements = Array.from(document.getElementById("Sings").children);
 
-    // Check if the number of song elements is as expected
+
     if (songElements.length === 83) {
-        // Loop through each song element
+
         for (let i = 0; i < songElements.length; i++) {
             let songElement = songElements[i];
             let titleElement = songElement.querySelector('.nm').firstElementChild; // Assuming there's a class 'title' for the song title
 
             songElement.addEventListener("click", function() {
-                // Toggle "active" class for the clicked song element
                 this.classList.toggle("active");
 
-                // Reset styles for all song elements
+
                 songElements.forEach(element => {
                     if (element !== this && element.classList.contains("active")) {
                         element.classList.remove("active");
@@ -388,7 +396,7 @@ function toggleActiveClass() {
                     }
                 });
 
-                // Change styles for the clicked song element
+
                 if (this.classList.contains("active")) {
                     this.children[1].style.opacity = "0";
                     this.querySelector('.play1').style.display = "block";
