@@ -289,7 +289,7 @@ body{
     /* padding: 0px 0px 0px 25px; */
     width: 100%;
     border-radius: var(--border);
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0) 89%, rgba(253, 165, 3, 0.847) 97%);
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0) 89%, rgb(221 145 14 / 79%) 97%);
     transition: background 5s ease-in;
     background-color: var(--backcolor);
 }
@@ -724,6 +724,7 @@ body{
     justify-content: center;
     gap: 20px;
     width: 100%;
+    cursor: pointer;
     height: 50px;
 }
 #play{
@@ -785,7 +786,7 @@ body{
     transition: all 0.1s linear;
     background-color: white;
 }
-.duration:hover .circle{
+.vol:hover #circle{
     display: block;
 }
 .extras{
@@ -819,9 +820,6 @@ body{
 .vol:hover{
     background-color: rgb(5, 167, 5);
 }
-.vol:hover .circle{
-    display: block;
-}
 .SongsList{
     overflow: hidden;
     display: flex;
@@ -829,7 +827,7 @@ body{
     width: 100%;
     padding: 0px 25px;
     margin-top: 20px;
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0) 90%, rgba(253, 165, 3, 0.111) 100%);
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0) 92%, rgb(32 23 8 / 62%) 101%);
 }
 .Playlist1{
     margin-left: 25px;

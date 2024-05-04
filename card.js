@@ -82,51 +82,88 @@ async function NewCard (image,name){
 `)
 }
 
-function playMusic(songs,image,title,artist){
+function playMusic(songs){
     let play = document.getElementById("play");
-    CurrentSongs.src = songs;
+    CurrentSongs.src = songs; 
     play.src = "Assets/Icons/Pause Button.svg"
     CurrentSongs.play();
-    setInterval(() => {
-        let duration = document.querySelector(".playback")
-        duration.lastElementChild.innerHTML = secondsToMinutesAndSeconds(CurrentSongs.duration)
-        duration.firstElementChild.innerHTML = secondsToMinutesAndSeconds(CurrentSongs.currentTime)
-    },1000)
+    play.addEventListener("click", ()=>{
+        if(CurrentSongs.paused){
+            play.src = "Assets/Icons/Pause Button.svg"
+            CurrentSongs.play();
+            
+        }
+        else{
+            CurrentSongs.pause();
+            play.src = "Assets/Icons/Play Button - Copy.svg"
+        }
+    })
+    let duration = document.getElementById("duration");
+    let playbackTime = document.querySelector(".playback");
+    // setInterval(() => {
+    //     let duration = document.querySelector(".playback")
+    //     duration.lastElementChild.innerHTML = secondsToMinutesAndSeconds(CurrentSongs.duration)
+    //     duration.firstElementChild.innerHTML = secondsToMinutesAndSeconds(CurrentSongs.currentTime)
+    // },1000)
+    // let duration = document.getElementById("duration")
+    // setInterval(() => {
+    //     duration.firstElementChild.style.left= `${CurrentSongs.currentTime / CurrentSongs.duration *100}%`
+    //     if(duration.onmouseover === true){
+    //         setInterval(() => {
+    //             duration.style.background = `linear-gradient(to right, #1ed760 0%, #1ed760 ${CurrentSongs.currentTime / CurrentSongs.duration *100 }%, #ffffff ${CurrentSongs.currentTime / CurrentSongs.duration *100}%, #ffffff 100%)`
+    //         }, 10);
+    //     }
+    //     else{
+    //         setInterval(() => {
+    //             duration.style.background = `linear-gradient(to right, #ffffff 0%, #ffffff ${CurrentSongs.currentTime / CurrentSongs.duration *100 }%, rgb(72, 72, 72) ${CurrentSongs.currentTime / CurrentSongs.duration *100}%, rgb(72, 72, 72) 100%)`
+    //         }, 10);
+    //     }
+    // },10)
+           
+    CurrentSongs.addEventListener("timeupdate", () => {
+        playbackTime.lastElementChild.innerHTML = secondsToMinutesAndSeconds(CurrentSongs.duration);
+        playbackTime.firstElementChild.innerHTML = secondsToMinutesAndSeconds(CurrentSongs.currentTime);
+
+        let percentComplete = (CurrentSongs.currentTime / CurrentSongs.duration) * 100;
+        duration.firstElementChild.style.left = `${percentComplete}%`;
+
+        let gradientColor = duration.onmouseover ? "#1ed760" : "rgb(72, 72, 72)";
+        duration.style.background = `linear-gradient(to right, #ffffff 0%, #ffffff ${percentComplete}%, ${gradientColor} ${percentComplete}%, ${gradientColor} 100%)`;
+    });
+
+    duration.addEventListener("click",(e)=>{
+        let percent = (e.offsetX/e.target.getBoundingClientRect().width)*100;
+        document.querySelector(".circle").style.left = percent + "%"
+        CurrentSongs.currentTime = ((CurrentSongs.duration)*percent)/100;
+    })
+   
+}
+ 
+
+function getTitle(image,title,artist){
     document.querySelector(".songImg").firstElementChild.src = image;
     document.querySelector("#Title").firstElementChild.innerHTML = title;
     document.querySelector("#Title").lastElementChild.innerHTML = artist;
-    play.addEventListener("click", ()=>{
-        if(CurrentSongs.paused){
-            CurrentSongs.play();
-            play.src = "Assets/Icons/Pause Button.svg"
-            let duration = document.getElementById("duration")
-            setInterval(() => {
-                    duration.firstElementChild.style.left= `${CurrentSongs.currentTime / CurrentSongs.duration *100}%`
-                    duration.style.background = `linear-gradient(to right, #ffffff 0%, #ffffff ${CurrentSongs.currentTime / CurrentSongs.duration *100 }%, rgb(72, 72, 72) ${CurrentSongs.currentTime / CurrentSongs.duration *100}%, rgb(72, 72, 72) 100%)`
-                duration.onmouseover = ()=>{
-                    duration.firstElementChild.style.left= `${CurrentSongs.currentTime / CurrentSongs.duration *100}%`
-                    duration.style.background = `linear-gradient(to right, #1ed760 0%, #1ed760 ${CurrentSongs.currentTime / CurrentSongs.duration *100 }%, #ffffff ${CurrentSongs.currentTime / CurrentSongs.duration *100}%, #ffffff 100%)`
-                }
-            },100,true)  
-    }
-    else{
-        CurrentSongs.pause();
-        play.src = "Assets/Icons/Play Button - Copy.svg"
-    }
-})
-
 }
 async function nextAndPrev(){
     let Next = document.getElementById("Next");
     let Previous = document.getElementById("Previous"); 
 
-    songs = await getSongs();
+    Previous.addEventListener("click",()=>{
+        let index = songs.indexOf(CurrentSongs.src);
+        if((index-1) >= 0){
+            playMusic(songs[index-1])
+        }
+    })
 
     Next.addEventListener("click", ()=>{
         let index = songs.indexOf(CurrentSongs.src);
-        console.log(index);
+        if((index+1) < songs.length-1){
+            playMusic(songs[index+1])
+        }
     })
 }
+nextAndPrev();
 async function main(){
 
 await NewCard("Assets/Images/default (3).jpeg","Kishore Kumar Mix");
@@ -288,10 +325,9 @@ async function getSongs(){
     return songs
 }
 
-
  async function Songs(){
     let html = document.getElementById("Sings")
-    let songs = await getSongs()
+    songs = await getSongs()
     for (const song of songs){
        jsmediatags.read(song , {
             onSuccess: function(tag) {
@@ -343,54 +379,18 @@ async function getSongs(){
 }
 
 
-// function toggleActiveClass() {
-//     let songElements = Array.from(document.getElementById("Sings").children)
-//     let ELementSong = []
-//     if(songElements.length === 83){
-//         ELementSong = songElements;
-//     for (let i = 0; i < ELementSong.length; i++) {
-//         let songElement = ELementSong[i];
-//         let song = songElement.children[2].children[1].children[0].getAttribute("href");
-//         let image = songElement.children[2].children[0].getAttribute("src");
-//         let titleElement = songElement.children[2].children[1].children[0];
-//         let title = titleElement.innerHTML;
-//         let artist = songElement.children[2].children[1].children[1].innerHTML;
-//         let play = songElement.children[0];
-//         songElement.addEventListener("click", function() {
-//             this.classList.add("active");
-//             songElement.children[1].style.opacity = "0";
-//             play.style.display = "block";
-//             play.src = "Assets/Icons/Play Icon.svg";
-//             titleElement.style.color = '#1ed760';
-//             for (let j = 0; j < songElements.length; j++) {
-//                 if (songElements[j] !== this && songElements[j].classList.contains("active")) {
-//                     songElements[j].classList.remove("active");
-//                 }
-//             }
-//             playMusic(song,image,title,artist);
-//         });
-//       }
-//     }
-// }
-
-
 function toggleActiveClass() {
     let songElements = Array.from(document.getElementById("Sings").children);
-
-
     if (songElements.length === 83) {
-
-        for (let i = 0; i < songElements.length; i++) {
-            let songElement = songElements[i];
+        songElements.forEach((songElement,index)=> {
             let titleElement = songElement.querySelector('.nm').firstElementChild; // Assuming there's a class 'title' for the song title
-
             songElement.addEventListener("click", function() {
-                this.classList.toggle("active");
-
+                this.classList.add("active");
 
                 songElements.forEach(element => {
                     if (element !== this && element.classList.contains("active")) {
                         element.classList.remove("active");
+                        element.children[1].style.opacity = "1";
                         element.querySelector('.play1').style.display = "none";
                         element.querySelector('.nm').firstElementChild.style.color = 'white';
                     }
@@ -412,9 +412,10 @@ function toggleActiveClass() {
                 let image = this.querySelector('.titlee').firstElementChild.getAttribute("src");
                 let title = titleElement.innerHTML;
                 let artist = this.querySelector('.nm').lastElementChild.innerHTML;
-                playMusic(song, image, title, artist);
+                playMusic(song);
+                getTitle(image, title, artist);
             });
-        }
+        });
     }
 }
 
