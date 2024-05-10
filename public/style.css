@@ -39,12 +39,12 @@ body{
 }
 .real{
     display: flex;
-    width: 100%;
+    width: 100vw;
     height: 94%;
     overflow: hidden;
 }
 .sidebar{
-    flex-basis: 23%;
+    width: 23%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -275,7 +275,7 @@ body{
 .main{
     display: flex;
     flex-direction: column;
-    flex-basis: 77%;
+    width: 77%;
     margin: 7px 0px 7px 0px;
     border-radius: var(--border);
     scrollbar-gutter: stable;
@@ -288,7 +288,6 @@ body{
     /* padding: 0px 0px 0px 25px; */
     width: 100%;
     border-radius: var(--border);
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0) 89%, rgb(221 145 14 / 79%) 97%);
     transition: background 5s ease-in;
     background-color: var(--backcolor);
 }
@@ -317,7 +316,14 @@ body{
     height: 32px;
     padding: 7px;
     border-radius: 50%;
-    background-color: var(--proback);
+    background: var(--proback);
+}
+#Forward{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.768);
 }
 /* .back img:hover{
     scale: 1.1;
@@ -380,12 +386,11 @@ body{
 }
 .all{
     margin: 12px 25px;
-    display: none;
+    display: flex;
     align-items: center;
     gap: 10px;
     cursor: pointer;
     color: rgb(255, 255, 255);
-
 }
 .all p{
     background-color: var(--proback);
@@ -394,6 +399,10 @@ body{
     transition: all 0.1s linear;
     padding: 5px 12px 8px 12px;
     border-radius: 20px;
+}
+.all p:first-of-type{
+    background-color: white;
+    color: black;
 }
 .scroll_2{
     display: flex;
@@ -420,7 +429,7 @@ body{
     width: 370px;
     align-items: center;
     height: 48px;
-    transition: 2s all ease-in;
+    transition: .2s all ease-in;
 }
 .card_2:hover{
     background-color: rgba(139, 139, 139, 0.408);
@@ -486,10 +495,11 @@ body{
 .ct2{
     min-width: 100%;
     display: flex;
-    gap: 20px;
+    /* gap: 20px; */
     overflow: hidden;
 }
 .hding{
+    width: 1120px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -512,8 +522,8 @@ body{
     font-weight: 500;
 }
 .cn1{
-    min-width: 165px;
-    height: 260px;
+    min-width: 188px;
+    height: 280px;
     display: flex;
     align-items: center;
     margin-top: 5px;
@@ -526,7 +536,7 @@ body{
     background-color:rgba(60, 59, 59, 0.847);
 }
 .fy{
-    width: 150px;
+    width: 165px;
     height: 230px;
     gap: 5px;
     display: flex;
@@ -656,23 +666,23 @@ body{
 .cc p:hover{
     color: white;
 }
-.rightbar{
+/* .rightbar{
     display: none;
     height: 100vh;
     width: 22%;
     padding: 7px 9px 7px 0px;
-}
-.right{
+} */
+/* .right{
     display: none;
     width: 100%;
     background-color: var(--backcolor);
     border-radius: var(--border);
-}
+} */
 .playbar{
     display: flex;
     align-items: center;
     bottom: 0;
-    width: 100%;
+    width: 100vw;
     height: 80px;
     padding: 2px 20px;
 }
@@ -1223,4 +1233,371 @@ input[type=range]::-moz-range-track{
     height: 4px;
     border-radius: 40px;
     background-color: #1ed75f00;
+}
+.all img{
+    display: none;
+}
+.plusIcon img:nth-child(1){
+    display: none;
+}
+.plusIcon img:nth-child(3){
+    display: none;
+}
+.bar li:last-child{
+    display: none;
+}
+
+@media screen and (max-width: 600px) {
+    ::-webkit-scrollbar {
+        width: 4px;
+        max-height: 10px;
+      }
+    body{
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+    }
+    .container{
+        background: black;
+        border-radius: 0px;
+        width: 100%;
+    }
+    .real{
+        display: flex;
+        flex-direction: column-reverse;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+    .sidebar{
+        padding: 0;
+        margin: 0;
+        z-index: 99;
+        width: 100vw;
+        height: 50px;
+        position: absolute;
+        background: linear-gradient(180deg, rgba(0,0,0,0) 29%, rgba(0,0,0,0.3254551820728291) 43%, rgba(0,0,0,0.7792366946778712) 56%, rgba(0,0,0,0.9248949579831933) 72%, rgba(0,0,0,0.8632703081232493) 89%);
+        bottom: 0;
+        display: flex;
+        flex-direction: row;
+    }
+    .bar{
+        padding: 0;
+        height: 40px;
+        background: transparent;
+        width: 100%;
+    }
+    .bar ul{
+        gap: 0px;
+        flex-direction: row;
+        justify-content: center;
+    }
+    .bar ul li{
+        gap: 5px;
+        opacity: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .bar li:last-child{
+        display: flex;
+    }
+    .bar p{
+        font-weight: 400;
+        font-size: 10px;
+    }
+    .library{
+        all: none;
+        display: none;
+        background: transparent;
+        overflow: hidden;
+    }
+    .connt{
+        display: none;
+    }
+    .add{
+        display: none;
+    }
+    .fixed{
+        background: transparent;
+        padding: 0;
+    }
+    .lib p{
+        display: none;
+    }
+    .scroll{
+        display: none;
+    }
+    .playlist{
+        display: none;
+    }
+    .main{
+        background: black;
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0px;
+        margin: 0px;
+    }
+    .playbar{
+        border-radius: 6px;
+        background: #1ed760;
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        bottom: 60px;
+        width: 95%;
+        margin: 0px 10px;
+        height: 52px;
+        padding: 0px 8px;
+    }
+    .songImg{
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 50px;
+        margin-top: 6px;
+        margin-bottom: 0px;
+    }
+    .songImg img:first-child{
+        width: 40px;
+        border-radius: 5px;
+    }
+    .name p:nth-child(1){
+        width: 170px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    .songImg .name p:last-child{
+        font-size: 12px;
+        font-weight: 400;
+        width: 150px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color:rgb(251, 251, 251);
+    }
+    .plusIcon{
+        position: relative;
+        left: calc(100% - 290px);
+        gap: 10px;
+    }
+    .plusIcon img:nth-child(1){
+        display: block;
+    }
+
+    .plusIcon img:nth-child(3){
+        display: block;
+    }
+    .plusIcon img:first-child{
+        opacity: 0.5;
+    }
+    .plusIcon img{
+        width: 20px;
+        height: 20px;
+    }
+    .controls{
+        display: none;
+    }
+    .playback span{
+        display: none;
+    }
+    .extras{
+        display: none;
+    }
+    .duration{
+        position: absolute;
+        background: transparent;
+        width: 90vw;
+        bottom: -1px;
+        height: 3px;
+    }
+    .hding{
+        margin-top: 15px;
+        width: 100%;
+    }
+    .hding p:last-child{
+        display: none;
+    }
+    .profile{
+        margin-left: 12px;
+        margin-right: 20px;
+        width: 0px;
+        justify-content: flex-start;
+    }
+    .butons{
+        display: none;
+    }
+    .premium{
+        display: none;
+    }
+    .notify{
+        display: none;
+    }
+    .inline{
+        display: flex;
+    }
+    .dp img{
+        width: 100%;
+        height: 100%;
+    }
+    .all{
+        margin-top: 20px;
+    }
+    .all p{
+        min-width: 40px;
+        height: 30px;
+        font-size: 12px;
+        justify-content: center;
+        padding-top: 7px;
+        align-items: center;
+    }
+    .all img{
+        display: block;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+    }
+    .all p:first-of-type{
+        background-color: #1ed760;
+    }
+    .scroll_2{
+        margin-top: 25px;
+        margin-left: 16px;
+        flex-wrap: wrap;
+        overflow: hidden;
+        height: 192px;
+    }
+    .card_2{
+        border-radius: 3px;
+        width: 45%;
+        height: 58px;
+        background: rgba(20, 20, 20, 0.689);
+    }
+    .butt{
+        display: none;
+    }
+    .card_2:hover .butt{
+        display: none;
+    }
+    .card_2 .image2{
+        width: 58px;
+        height: 58px;
+    }
+    .card_2 .image2 img{
+        width: 58px;
+        height: 58px;
+    }
+    .card_2 .name{
+        font-size: 12px;
+        font-weight: 500;
+        width: 100px;
+        height: 58px;
+        color: white;
+        text-wrap: wrap;
+    }
+    .scroller{
+        margin-top: 12px;
+        margin-left: 12px;
+    }
+    .ct2{
+        overflow:auto;
+    }
+    .ct2::-webkit-scrollbar{
+        width: 2px;
+        max-height: 0px;
+    }
+    .ct2 .cn1{
+        margin-top: 0px;
+        min-width: 177px;
+    }
+    .btn img{
+        border-radius: 0px;
+    }
+    .upfoot{
+        display: none;
+    }
+    .line{
+        margin: 0px 12px;
+        width: 94%;
+    }
+    .footer{
+        margin: 0px 12px;
+    }
+    .footer p:last-child{
+        font-size: 13px;
+    }
+    .cc{
+        display: flex;
+        flex-direction: column;
+    }
+    .foot{
+        display: none;
+    }
+    .Playlist1 .PlayName{
+        display: none;
+    }
+    .Playlist1{
+        margin-left: 0px;
+        align-items: center;
+        justify-content: center
+    }
+    .profile{
+        display: none;
+    }
+    .SongsList{
+        padding: 0px 0px;
+    }
+    .PlayButton{
+        margin-left: 12px;
+        /* justify-content: unset; */
+    }
+    .Sings{
+        gap: 0px;
+        margin-top: 0px;
+        margin-bottom: 25px;
+    }
+    .titlebar{
+        display: none;
+    }
+    ul{
+        list-style: none;    
+    }
+    .Sings li{
+        width: 96%;
+        padding: 0px 10px;
+        grid-template-columns: 295px 50px;
+    }
+    .nm p:nth-child(1){
+        font-size: 14px;
+        width: 220px;
+    }
+    .titlee{
+        gap: 10px;
+    }
+    .titlee img{
+        border-radius: 0px;
+    }
+    .nm p:nth-child(2){
+        width: 200px;
+        font-size: 12px;
+    }
+    #player{
+        display: none;
+    }
+    .Sings li .nos{
+        display: none;
+    } 
+    .Album{
+        display: none;
+    } 
+    .dateAdded{
+        display: none;
+    }
+    .dur{
+        display: none;
+    }
 }

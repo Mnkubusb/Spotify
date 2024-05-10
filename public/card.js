@@ -1,7 +1,27 @@
 
 const jsmediatags = window.jsmediatags;
-let songs;
+let songs = [];
 let CurrentSongs = new Audio()
+let link;
+let mediaQuery = window.matchMedia("(max-width: 600px)");
+async function getSongs(link){
+    let data = await fetch(`/Assets/Music/${link}/`)
+    let song = await data.text()
+    let div = document.createElement('div')
+    div.innerHTML = song;
+    songs = [];
+    let a = div.getElementsByTagName('a')
+    for (let index = 0; index < a.length; index++) {
+        const element = a[index];
+        if(element.href.endsWith('.mp3'))
+        { 
+            songs.push(element.href)
+        }
+    }
+
+    return songs
+
+}
 function secondsToMinutesAndSeconds(totalSeconds) {
     var minutes = Math.floor(totalSeconds / 60);
     var seconds = Math.floor(totalSeconds % 60);
@@ -81,17 +101,24 @@ async function NewCard (image,name){
 }
 
 function playMusic(songs){
+    console.log(songs)
     let play = document.getElementById("play");
+    let mediaplay = document.getElementById("mediaplay");
+    let playmedia = document.getElementById("playmedia");
     CurrentSongs.src = songs; 
     play.src = "Assets/Icons/Pause Button.svg"
+    mediaplay.src = "Assets/Icons/Play Icon.svg";
+    playmedia.style.marginLeft = '0px';
+    playmedia.src = "Assets/Icons/Pause icon.svg";
     CurrentSongs.play(); 
-
     play.removeEventListener("click", togglePlay);
     play.addEventListener("click", togglePlay);
-
+    mediaplay.removeEventListener("click", togglePlay);
+    mediaplay.addEventListener("click", togglePlay);
+    playmedia.removeEventListener("click", togglePlay);
+    playmedia.addEventListener("click", togglePlay);
     let duration = document.getElementById("duration");
     let playbackTime = document.querySelector(".playback");
-           
     CurrentSongs.addEventListener("timeupdate", () => {
         playbackTime.lastElementChild.innerHTML = secondsToMinutesAndSeconds(CurrentSongs.duration);
         playbackTime.firstElementChild.innerHTML = secondsToMinutesAndSeconds(CurrentSongs.currentTime);
@@ -103,10 +130,13 @@ function playMusic(songs){
 
         duration.style.background = `linear-gradient(to right, #ffffff 0%, #ffffff ${percentComplete}%, ${gradientColor} ${percentComplete}%, ${gradientColor} 100%)`;
         playbackTime.onmouseover = () => {
-                duration.style.background = `linear-gradient(to right, #1ed760 0%, #1ed760 ${percentComplete}%, ${gradientColor} ${percentComplete}%, ${gradientColor} 100%)`;
+            duration.style.background = `linear-gradient(to right, #1ed760 0%, #1ed760 ${percentComplete}%, ${gradientColor} ${percentComplete}%, ${gradientColor} 100%)`;
         }
         playbackTime.onmouseleave = () => {
             duration.style.background = `linear-gradient(to right, #ffffff 0%, #ffffff ${percentComplete}%, ${gradientColor} ${percentComplete}%, ${gradientColor} 100%)`;
+        }
+        if(CurrentSongs.currentTime===CurrentSongs.duration){
+            onNextClick();
         }
     });
 
@@ -115,13 +145,12 @@ function playMusic(songs){
         document.querySelector(".circle").style.left = percent + "%"
         CurrentSongs.currentTime = ((CurrentSongs.duration)*percent)/100;
     })
-    jsmediatags.read( songs , {
+    jsmediatags.read(songs , {
         onSuccess: function(tag) {
             const data = tag.tags.picture.data;
             const format = tag.tags.picture.format;
             let base64String ="";
             let title = tag.tags.title;
-            let album = tag.tags.album;
             let artist = tag.tags.artist.replaceAll("/",", ");
             for(let index = 0; index < data.length; index++)
             {
@@ -139,10 +168,18 @@ function playMusic(songs){
 
 function togglePlay() {
     let play = document.getElementById("play");
+    let mediaplay = document.getElementById("mediaplay");
+    let playmedia = document.getElementById("playmedia");
     if (CurrentSongs.paused) {
+        playmedia.style.marginLeft = '5px';
+        playmedia.src = "Assets/Icons/Play Icon-1.svg";
+        mediaplay.src = "Assets/Icons/Play Icon.svg";
         play.src = "Assets/Icons/Pause Button.svg";
         CurrentSongs.play();
     } else {
+        playmedia.style.marginLeft = '0px';
+        playmedia.src = "Assets/Icons/Pause icon.svg";
+        mediaplay.src = "Assets/Icons/Play Icon-1.svg";
         play.src = "Assets/Icons/Play Button - Copy.svg";
         CurrentSongs.pause();
     }
@@ -170,9 +207,9 @@ async function nextAndPrev(){
 function onNextClick() {
     let index = songs.indexOf(CurrentSongs.src);
     if((index+1) < songs.length-1){
+        console.log(index)
         playMusic(songs[index+1]);
-        let title = songs[index+1].split("Songs/")[1].replaceAll("%20"," ").replace(".mp3","").replaceAll(`_`,`"`);
-        console.log(title);
+        let title = songs[index+1].split(`${link}/`)[1].replaceAll("%20"," ").replace(".mp3","").replaceAll(`_`,`"`);
         Active(title);
     }
 }
@@ -181,7 +218,7 @@ function onPreviousClick() {
     let index = songs.indexOf(CurrentSongs.src);
     if((index-1) >= 0 ){
         playMusic(songs[index-1]);
-        let title = songs[index-1].split("Songs/")[1].replaceAll("%20"," ").replace(".mp3","").replaceAll(`_`,`"`);
+        let title = songs[index-1].split(`${link}/`)[1].replaceAll("%20"," ").replace(".mp3","").replaceAll(`_`,`"`);
         Active(title);
     }
 }
@@ -221,23 +258,60 @@ function Volume(){
 
     })
 }
-
-async function main() {
+function handleMediaQueryChange(mediaQuery){
+    let playbar = document.querySelector(".playbar");
+    let img = document.querySelector(".songImg").firstElementChild;
+    let colors = getAverageRGB(img);
+    if(mediaQuery.matches){
+        playbar.style.background = `rgb(${colors.r}, ${colors.g}, ${colors.b})`;
+    }else{
+        playbar.style.background = `trasparent`;
+    }
+}
+async function main(link){
+    songs = await getSongs(link);
     Volume();
-    songs = await getSongs();
+    handleMediaQueryChange(mediaQuery)
+    mediaQuery.addEventListener("change", handleMediaQueryChange);
+
+    let images = Array.from(document.getElementsByClassName("card_2"));
+
+    function handleMouseOver(event) {
+        let image = event.target.querySelector(".Backimg");
+
+        let colors = getAverageRGB(image);
+
+        let bgChangeElement = document.getElementById("BGChange");
+
+        bgChangeElement.style.background = `linear-gradient(0deg, rgba(0, 0, 0, 0) 75%, rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.30) 90%)`;
+    }
+
+
+    for (let index = 0; index < images.length; index++) {
+        images[index].addEventListener("mouseover", handleMouseOver,true);
+    }
+
+    DynamicLib();
+    Songs();
+    BackButton();
+    nextAndPrev();
+    let Playlist = document.getElementById("Change");
+    let PlayName = Playlist.querySelector(".PlayName")
+    let Number = songs.length;
+    PlayName.lastElementChild.lastElementChild.innerHTML = `${Number} songs, about 10hr`;
+}
+async function DyLib(){
     await NewCard("Assets/Images/default (3).jpeg", "Kishore Kumar Mix");
     await NewCard("Assets/Images/default (4).jpeg", "Upbeat Mix");
     await NewCard("Assets/Images/default (1).jpeg", "Daily Mix 6");
     await NewCard("Assets/Images/default (2).jpeg", "Daily Mix 4");
     await NewCard("Assets/Images/default (6).jpeg", "2010s Mix");
-    await NewCard("Assets/Images/default (5).jpeg", "Romantic Mix");
-    await NewCard("Assets/Images/default (7).jpeg", "ABBA Mix");
 
     await FinalCard("Assets/Images/default (3).jpeg", "Kishore Kumar Mix", "Mohammad Rafi, Sushma Shrestha and Amit Kumar")
     await FinalCard("Assets/Images/default (4).jpeg", "Upbeat Mix",);
     await FinalCard("Assets/Images/default (5).jpeg", "Romantic Mix",);
     await FinalCard("Assets/Images/default (6).jpeg", "2010s mix",);
-    await FinalCard("Assets/Images/Evergreen.jpeg", "OLd EverGreen Hindi Songs");
+    await FinalCard("Assets/Images/Evergreen.jpeg", "Old EverGreen Hindi Songs");
     await FinalCard("Assets/Images/PZN_On_Repeat2_DEFAULT-en.jpg", "On Repeat");
 
     await Section("Made for STRANGE");
@@ -248,31 +322,36 @@ async function main() {
     await FinalCard("Assets/Images/default (8).jpeg", "Daily Mix 1");
     await FinalCard("Assets/Images/default.jpeg", "Daily Mix 3");
     await FinalCard("Assets/Images/Discover Weekly.jpeg", "Discover Weekly");
-
-
-    let images = document.getElementsByClassName("Backimg");
-
-
-    function handleMouseOver(event) {
-
-        let colors = getAverageRGB(event.target);
-
-        let bgChangeElement = document.getElementById("BGChange");
-
-        bgChangeElement.style.background = `linear-gradient(0deg, rgba(0, 0, 0, 0) 65%, rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.6) 90%)`;
-    }
-
-
-    for (let index = 0; index < images.length; index++) {
-
-        images[index].addEventListener("mouseover", handleMouseOver, true);
-    }
-
-    nextAndPrev();
-    DynamicLib();
-    Songs();
 }
 
+async function DynamicLib(){
+    let libs = Array.from(document.querySelectorAll(".cn1"));
+    libs.forEach(LibElement => {
+        LibElement.removeEventListener("click",onLibClick,false);
+        LibElement.addEventListener("click",onLibClick),false;
+    });
+}
+function onLibClick(e){
+        document.getElementById("Sings").innerHTML = "";
+        link = e.currentTarget.querySelector(".hd1").firstElementChild.innerHTML.replaceAll(" ","%20");
+        main(link);
+        let img = e.currentTarget.querySelector(".btn").firstElementChild.src;
+        let title = link.replaceAll("%20"," ");
+        let Playlist = document.getElementById("Change");
+        Playlist.children[0].firstElementChild.src = img;
+        let PlayName = Playlist.querySelector(".PlayName")
+        PlayName.children[1].innerHTML = title;
+        let imgcolor = getAverageRGB(e.currentTarget.querySelector(".btn").firstElementChild);
+        document.getElementById("BGChange").style.background = `linear-gradient(0deg, rgba(0, 0, 0, 0) 75%, rgba(${imgcolor.r}, ${imgcolor.g}, ${imgcolor.b}, 0.30) 90%)`;
+        document.querySelector(".SongsList").style.background = `linear-gradient(0deg, rgba(0, 0, 0, 0) 92%, rgb(${imgcolor.r} , ${imgcolor.g} , ${imgcolor.b},0.1) 101%)`;
+        document.getElementById("Forward").style.background = "rgba(24, 24, 24, 0.737)";
+        document.getElementById("Back").style.background = "black";
+        document.querySelector(".Playlist1").style.display = "flex";
+        document.querySelector(".SongsList").style.display = "flex";
+        document.querySelector(".all").style.display = "none";
+        document.querySelector(".scroll_2").style.display = "none";
+        document.querySelector(".scroller").style.display = "none";
+}
 
 async function Section(title){
    document.getElementById("Scc").insertAdjacentHTML("beforeend",`
@@ -282,7 +361,7 @@ async function Section(title){
                 </div>
                 <div class="ct2" id="ct2">
                 </div>
-`)
+            `)
 }
 
 
@@ -370,73 +449,57 @@ function getAverageRGB(imgEl) {
 
 }
 
-async function getSongs(){
-    let data = await fetch('/Assets/Music/Old%20Evergreen%20Hindi%20Songs/')
-    let song = await data.text()
-    let div = document.createElement('div')
-    div.innerHTML = song;
-    let a = div.getElementsByTagName('a')
-    let songs =[]
-    for (let index = 0; index < a.length; index++) {
-        const element = a[index];
-        if(element.href.endsWith('.mp3'))
-        { 
-            songs.push(element.href)
-        }
-    }
-    return songs
-}
+
 
  async function Songs(){
     let html = document.getElementById("Sings")
-    let Gaana = await getSongs();
-    for (const song of Gaana){
-       jsmediatags.read( song , {
-            onSuccess: function(tag) {
-                const data = tag.tags.picture.data;
-                const format = tag.tags.picture.format;
-                let base64String ="";
-                let title = tag.tags.title;
-                let album = tag.tags.album;
-                let artist = tag.tags.artist.replaceAll("/",", ");
-                for(let index = 0; index < data.length; index++)
-                {
-                    base64String += String.fromCharCode(data[index]);
-                }
-                let image = "data:image/"+format+";base64,"+window.btoa(base64String);
-                let nos = html.children.length + 1;
-               html.insertAdjacentHTML("beforeend",`
-                <li>
-                    <img id="player" class="play1" src="Assets/Icons/Play Icon-1 copy.svg" alt="">                                 
-                    <span class="nos">${nos}</span>
-                    <div class="titlee">
-                        <img src="${image}" alt="">
-                        <div class="nm">
-                            <p href="${song}">${title}</p>
-                            <p>${artist}</p>
+        for (const song of songs){
+           jsmediatags.read( song, {
+                onSuccess: function(tag) {
+                    const data = tag.tags.picture.data;
+                    const format = tag.tags.picture.format;
+                    let base64String ="";
+                    let title = tag.tags.title;
+                    let album = tag.tags.album;
+                    let artist = tag.tags.artist.replaceAll("/",", ");
+                    for(let index = 0; index < data.length; index++)
+                    {
+                        base64String += String.fromCharCode(data[index]);
+                    }
+                    let image = "data:image/"+format+";base64,"+window.btoa(base64String);
+                    let nos = html.children.length + 1;
+                   html.insertAdjacentHTML("beforeend",`
+                    <li>
+                        <img id="player" class="play1" src="Assets/Icons/Play Icon-1 copy.svg" alt="">                                 
+                        <span class="nos">${nos}</span>
+                        <div class="titlee">
+                            <img src="${image}" alt="">
+                            <div class="nm">
+                                <p href="${song}">${title}</p>
+                                <p>${artist}</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="Album">
-                        <p>${album}</p>
-                    </div>
-                    <div class="dateAdded">
-                        <p></p>
-                        <img src="Assets/Icons/Add Icon-1.svg" alt="">
-                    </div>
-                    <div class="dur">
-                        <p>00:00</p>
-                        <span>•••</span>
-                    </div>
-                </li>
-                `)
-
-                toggleActiveClass();
-            },
-            onError: function(error) {
-                console.log(':(', error.type, error.info);
-            }
-        });
-    } 
+                        <div class="Album">
+                            <p>${album}</p>
+                        </div>
+                        <div class="dateAdded">
+                            <p></p>
+                            <img src="Assets/Icons/Add Icon-1.svg" alt="">
+                        </div>
+                        <div class="dur">
+                            <p>00:00</p>
+                            <span>•••</span>
+                        </div>
+                    </li>
+                    `)
+    
+                    toggleActiveClass();
+                },
+                onError: function(error) {
+                    console.log(':(', error.type, error.info);
+                }
+            });
+        } 
 }
 function toggleActiveClass() {
     let songElements = Array.from(document.getElementById("Sings").children);
@@ -469,31 +532,42 @@ function toggleActiveClass() {
                 let artist = this.querySelector('.nm').lastElementChild.innerHTML;
                 Active(title);
                 playMusic(song);
+                let playmedia = document.getElementById("playmedia");
+                playmedia.onclick = () => { playMusic(song) };
             });
         });
     }
 }
-function DynamicLib(){
+function BackButton(){
     let Back = document.getElementById("Back").firstElementChild;
     let Next = document.getElementById("Forward").firstElementChild;
-    Back.addEventListener("click",(e)=>{
-        document.querySelector(".Playlist1").style.display = "none";
-        document.querySelector(".SongsList").style.display = "none";
-        document.querySelector(".all").style.display = "flex";
-        document.querySelector(".scroll_2").style.display = "flex";
-        document.querySelector(".scroller").style.display = "flex";
-    })
-    Next.addEventListener("click",(e)=>{
-        document.querySelector(".Playlist1").style.display = "flex";
-        document.querySelector(".SongsList").style.display = "flex";
-        document.querySelector(".all").style.display = "none";
-        document.querySelector(".scroll_2").style.display = "none";
-        document.querySelector(".scroller").style.display = "none";
-    })
+    let Home = document.getElementById("Home")
+    Home.addEventListener("click",libList)
+    Back.addEventListener("click",libList)
+    Next.addEventListener("click",SongsList)
 }
 
-function Play(){
-    
+function libList(){
+    document.getElementById("Back").style.background = "rgba(24, 24, 24, 0.737)";
+    document.getElementById("Forward").style.background = "black";
+    document.querySelector(".Playlist1").style.display = "none";
+    document.querySelector(".SongsList").style.display = "none";
+    document.querySelector(".all").style.display = "flex";
+    document.querySelector(".scroll_2").style.display = "flex";
+    document.querySelector(".scroller").style.display = "flex";
 }
+function SongsList(){
+    document.getElementById("Forward").style.background = "rgba(24, 24, 24, 0.737)";
+    document.getElementById("Back").style.background = "black";
+    document.querySelector(".Playlist1").style.display = "flex";
+    document.querySelector(".SongsList").style.display = "flex";
+    document.querySelector(".all").style.display = "none";
+    document.querySelector(".scroll_2").style.display = "none";
+    document.querySelector(".scroller").style.display = "none";
+}
+
+
+
+DyLib();
 main();
 
