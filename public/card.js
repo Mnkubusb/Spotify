@@ -454,6 +454,7 @@ function getAverageRGB(imgEl) {
  async function Songs(){
     let html = document.getElementById("Sings")
         for (const song of songs){
+            console.log(song)
            jsmediatags.read( song, {
                 onSuccess: function(tag) {
                     const data = tag.tags.picture.data;
